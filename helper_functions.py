@@ -79,10 +79,10 @@ hosts = [
             'host_string4.com'    
             ]
 
-port = port_number
-service_name = db_name
-dis = user_name
-guise = password
+port = 123
+service_name = 'db_name'
+dis = 'user_name'
+guise = 'password'
 
 def dsn_list(): 
     '''Creates a list of connection strings to be used by open_db()'''
