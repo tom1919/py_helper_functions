@@ -11,7 +11,8 @@ Functions:
     2. get_path(name = 'tom')
     3. set_dir(name = 'tom')
     4. open_db()
-    5. read_chunks(query, chunksize, rows) 
+    5. read_chunks(query, chunksize, rows)
+    6. missing_value_df(df, sort = False)
     
 Installation:
     1. Copy the file "helper_functions.py" into a PYTHONPATH directory
@@ -139,6 +140,31 @@ def read_chunks(query, chunksize, rows):
     df = pd.concat(result_list)
     
     return(df)
+
+#%%
+# Misc functions
+    
+def missing_value_df(df, sort = False):
+    '''
+    takes a DF and returns a DF that shows how many missing vals in each col
+    '''
+    
+    mis_val = df.isnull().sum()
+    mis_val_percent = 100 * df.isnull().sum() / len(df)
+    mis_val_table = pd.concat([mis_val, mis_val_percent], axis=1)
+    
+    mis_val_table = mis_val_table.rename(
+        columns = {0 : 'missing_vals', 1 : 'mis_val_percent'})
+    
+    if sort == True:
+        mis_val_table = mis_val_table.sort_values('mis_val_percent', 
+                                                  ascending=False)
+        
+    print ("Your selected dataframe has " + str(df.shape[1]) + " columns.\n"      
+        "There are " + str(mis_val_table[mis_val_table.iloc[:,1] != 0].shape[0]) +
+          " columns that have missing values.")
+    
+    return mis_val_table
 
 #%%
 # Examples of running query
