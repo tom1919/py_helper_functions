@@ -272,6 +272,13 @@ def msg(text = 'Finished Running Code'):
     popup.geometry('300x200')
     popup.mainloop()
 
+def set_diff(list_a, list_b):
+    in_a_not_b = list(set(list_a) - set(list_b))
+    in_b_not_a = list(set(list_b) - set(list_a))
+    print('length of in list a but not in list b: ' + str(len(in_a_not_b)))
+    print('length of in list b but not in list a: ' + str(len(in_b_not_a)))
+    return in_a_not_b, in_b_not_a
+
 #%%
 # Examples of running query
 
