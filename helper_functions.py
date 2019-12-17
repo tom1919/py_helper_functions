@@ -13,6 +13,10 @@ Functions:
     4. open_db()
     5. read_chunks(query, chunksize, rows)
     6. missing_value_df(df, sort = False)
+    7. multilabel_sample(y, size=1000, min_count=5, seed=None)
+    8. multilabel_sample_dataframe(df, labels, size, min_count=5, seed=None)
+    9. multilabel_train_test_split(X, Y, size, min_count=5, seed=None)
+    10. msg(text = 'Finished Running Code')
     
 Installation:
     1. Copy the file "helper_functions.py" into a PYTHONPATH directory
@@ -28,11 +32,12 @@ Installation:
 import os
 import cx_Oracle
 import pandas as pd
-import numpy as np
-import warnings as warn
 import math
 import time
 import sys
+import tkinter as tk
+from datetime import datetime
+from tkinter import ttk
 from shutil import copy
 
 #%%
@@ -245,6 +250,27 @@ def multilabel_train_test_split(X, Y, size, min_count=5, seed=None):
     
     return (X[train_set_mask], X[test_set_mask], Y[train_set_mask], 
             Y[test_set_mask])
+
+def msg(text = 'Finished Running Code'):
+    '''
+    creates poopup message with passed in text
+    '''
+    popup = tk.Tk()
+    popup.wm_title("Message")
+    
+    label = ttk.Label(popup, text=text, font=("Verdana", 12))
+    label.pack(pady=10,padx=10)
+    cur_time = datetime.now().strftime("%H:%M:%S")
+    time = ttk.Label(popup, text= cur_time, font=("Verdana", 12))
+    time.pack(pady=10,padx=10)
+    space = ttk.Label(popup, text= '', font=("Verdana", 12))
+    space.pack(pady=10,padx=10)
+    
+    B1 = ttk.Button(popup, text="Close", command = popup.destroy)
+    B1.pack()
+    
+    popup.geometry('300x200')
+    popup.mainloop()
 
 #%%
 # Examples of running query
