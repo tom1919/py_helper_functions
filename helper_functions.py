@@ -247,7 +247,7 @@ def multilabel_train_test_split(X, Y, size, min_count=5, seed=None):
     index = Y.index if isinstance(Y, pd.DataFrame) else np.arange(Y.shape[0])
     test_set_idxs = multilabel_sample(Y, size=size, min_count=min_count, 
                                       seed=seed)
-    train_set_idxs = np.setdiff1d(index, test_set_idxs)
+    #train_set_idxs = np.setdiff1d(index, test_set_idxs)
     test_set_mask = index.isin(test_set_idxs)
     train_set_mask = ~test_set_mask
     
@@ -305,6 +305,7 @@ def popup_msg(code_desc, run_time, start_time, end_time):
     B1.pack()
     
     # popup.geometry('300x200') # size
+    popup.after(1000 * 30, lambda: popup.destroy()) # close after 30 secs
     popup.mainloop() 
 
 def email_msg(code_desc, run_time, start_date, end_date, body):
