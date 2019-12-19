@@ -364,7 +364,7 @@ def msg(start_time = '?', code_desc = '?', extd_desc = '', kind = 'popup'):
     ----------
     start_time : number
         current time in seconds since the Epoch. The default is '?'.
-    code_desc : TYPE, string
+    code_desc : string
         description of code being run. The default is '?'.
     extd_desc : string
         extended description of code being run
