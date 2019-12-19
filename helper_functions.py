@@ -6,6 +6,9 @@ The module "helper_functions" contains functions that I frequently use.
 
 @author: Tommy Lang
 
+TODO:
+    1. update docs
+
 Functions:
     1. update_mod(destination = 'default', source = src) 
     2. get_path(name = 'tom')
@@ -58,7 +61,10 @@ def update_mod(destination = 'default', source = src):
     
     print('helper_functions.py file copied to dir: ', destination)
 
-# update_mod()
+if __name__ == '__main__':
+    import sys
+    from shutil import copy
+    update_mod()
     
 #%% File Path
 
@@ -358,7 +364,7 @@ def email_msg(code_desc, run_time, start_date, end_date, body):
 
 def msg(start_time = '?', code_desc = '?', extd_desc = '', kind = 'popup'):
     '''
-    Logs time for code to run and creates popup or sends email about it
+    Logs time for code to run and creates popup or sends email to notify you
 
     Parameters
     ----------
@@ -371,9 +377,11 @@ def msg(start_time = '?', code_desc = '?', extd_desc = '', kind = 'popup'):
     kind : string, optional
         dictates whether a 'popup' or 'email' is made. The default is 'popup'.
 
-    Returns
+    Example
     -------
-    None.
+    t = hf.t()
+    *** block of code to be logged
+    hf.msg(t, 'desc of code', 'extended desc of code being run')
 
     '''
     
