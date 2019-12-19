@@ -255,72 +255,88 @@ def multilabel_train_test_split(X, Y, size, min_count=5, seed=None):
     return (X[train_set_mask], X[test_set_mask], Y[train_set_mask], 
             Y[test_set_mask])
 
-def t():
-    '''
-    returns current time in seconds since the Epoch. used for input to msg()
+def set_diff(list_a, list_b):
+    in_a_not_b = list(set(list_a) - set(list_b))
+    in_b_not_a = list(set(list_b) - set(list_a))
+    print('length of in list a but not in list b: ' + str(len(in_a_not_b)))
+    print('length of in list b but not in list a: ' + str(len(in_b_not_a)))
+    return in_a_not_b, in_b_not_a
 
-    '''
-    return(time.time())
+#%% Code Run Time Log
 
-def msg(start_time = '?', 
-        code_desc = '?', 
-        body = '', 
-        my_email = 'py.notify1@gmail.com', 
-        prd = 'yourfunny1', 
-        send_email = 'tommywlang@gmail.com', 
-        ):
+def popup_msg(code_desc, run_time, start_time, end_time):
     '''
-    Sends an email message for tracking when code is done running
+    generates a pop up message to notify that code is done running
 
     Parameters
     ----------
-    start_time : TYPE: number, optional
-        current time in seconds since the Epoch. The default is '?'.
-    code_desc : TYPE: string, optional
-        description of code being run. The default is '?'.
-    body : TYPE: string, optional
-        body of email message. The default is ''.
-    my_email : TYPE: string, optional
-        from email address. The default is 'py.notify1@gmail.com'.
-    prd : TYPE: string, optional
-        password of email address. The default is 'yourfunny1'.
-    send_email : TYPE: string, optional
-        email address being sent to. The default is 'tommywlang@gmail.com'.
+    code_desc : string
+        description of code being run
+    run_time : string
+        amount of time that code took to run
+    start_date : string
+        date and time that code started running
+    end_date : string
+        date and time that code finished running
 
     Returns
     -------
     None.
 
     '''
+  
+    popup = tk.Tk()
+    popup.wm_title("Code Runtime Log")
     
-    # end time in seconds and end time/date
-    end_time = time.time()
-    end_date = time.strftime('%m/%d/%y - %H:%M:%S', 
-                             time.localtime((end_time)))
+    # text in popup message
+    desc = ttk.Label(popup, text = code_desc, font=("Verdana", 12))
+    desc.pack(pady=3,padx=3)
+    runtime = ttk.Label(popup, text= 'Run Time: {}'.format(run_time), 
+                        font=("Verdana", 12))
+    runtime.pack(pady=3,padx=3)
+    starttime = ttk.Label(popup, text= 'Start Time: {}'.format(start_time), 
+                          font=("Verdana", 12))
+    starttime.pack(pady=3,padx=3)
+    endtime = ttk.Label(popup, text= 'End Time: {}'.format(end_time), 
+                          font=("Verdana", 12))
+    endtime.pack(pady=4,padx=4)
     
-    # calc start date/time and runtime if possible
-    try:
-        # date/time of start and elapsed time in seconds
-        start_date = time.strftime('%m/%d/%y - %H:%M:%S',
-                           time.localtime((start_time)))
-        runtime = end_time - start_time
-        
-        # if run time is greater 180 days then its prob wrong
-        if runtime > 180*86400:
-            runtime = '?'        
-        elif runtime <= 120: # report 2 min or less in seconds
-            runtime = str(round(runtime, 1)) + ' sec'
-        elif runtime <= 7200: # report 2 hours or less in mins
-            runtime = str(round(runtime/60, 1)) + ' min'   
-        else: 
-            runtime = str(round(runtime/3600, 1)) + ' hr'
+    # close button on pop up message
+    B1 = ttk.Button(popup, text="Close", command = popup.destroy)
+    B1.pack()
+    
+    # popup.geometry('300x200') # size
+    popup.mainloop() 
 
-    except:
-        runtime = '?'
-        start_date = '?'
+def email_msg(code_desc, run_time, start_date, end_date, body):
+    '''
+    Sends an email message for tracking when code is done running
+
+    Parameters
+    ----------
+    code_desc : string
+        description of code being run
+    run_time : string
+        amount of time that code took to run
+    start_date : string
+        date and time that code started running
+    end_date : string
+        date and time that code finished running
+    body : string
+        extended description of code being run. is put in body of email
+
+    Returns
+    -------
+    None.
+
+    '''
+
+    my_email = 'py.notify1@gmail.com'
+    prd = 'yourfunny1'
+    send_email = 'tommywlang@gmail.com'
     
     email_subject = 'DESC: {} | RUNTIME: {} | START: {} | END: {}'\
-        .format(code_desc, runtime, start_date, end_date)
+        .format(code_desc, run_time, start_date, end_date)
     
     # connect to SMTP server
     s = smtplib.SMTP(host='smtp.gmail.com', port=587)
@@ -338,46 +354,80 @@ def msg(start_time = '?',
     # send email
     s.send_message(email)
     
-    
-def popup_msg(text = 'Finished Running Code'):
+
+
+def msg(start_time = '?', code_desc = '?', extd_desc = '', kind = 'popup'):
     '''
-    creates poopup message with passed in text
+    Logs time for code to run and creates popup or sends email about it
 
     Parameters
     ----------
-    text : TYPE: string, optional
-        text displayed in popup msg. The default is 'Finished Running Code'.
+    start_time : number
+        current time in seconds since the Epoch. The default is '?'.
+    code_desc : TYPE, string
+        description of code being run. The default is '?'.
+    extd_desc : string
+        extended description of code being run
+    kind : string, optional
+        dictates whether a 'popup' or 'email' is made. The default is 'popup'.
 
     Returns
     -------
     None.
 
     '''
-    popup = tk.Tk()
-    popup.wm_title("Message")
     
-    # text in popup message
-    label = ttk.Label(popup, text=text, font=("Verdana", 12))
-    label.pack(pady=10,padx=10)
-    cur_time = datetime.now().strftime("%H:%M:%S")
-    time = ttk.Label(popup, text= cur_time, font=("Verdana", 12))
-    time.pack(pady=10,padx=10)
-    space = ttk.Label(popup, text= '', font=("Verdana", 12))
-    space.pack(pady=10,padx=10)
+    # end time in seconds and end time/date
+    end_time = time.time()
+    end_date = time.strftime('%m/%d/%y - %H:%M:%S', 
+                             time.localtime((end_time)))
     
-    # close button on pop up message
-    B1 = ttk.Button(popup, text="Close", command = popup.destroy)
-    B1.pack()
-    
-    popup.geometry('300x200') # size
-    popup.mainloop()
+    # calc start date/time and runtime if possible
+    try:
+        # date/time of start and elapsed time in seconds
+        start_date = time.strftime('%m/%d/%y - %H:%M:%S',
+                           time.localtime((start_time)))
+        run_time = end_time - start_time
+        
+        # if run time is greater 180 days then its prob wrong
+        if run_time > 180*86400:
+            run_time = '?'        
+        elif run_time <= 120: # report 2 min or less in seconds
+            run_time = str(round(run_time, 1)) + ' sec'
+        elif run_time <= 7200: # report 2 hours or less in mins
+            run_time = str(round(run_time/60, 1)) + ' min'   
+        else: 
+            run_time = str(round(run_time/3600, 1)) + ' hr'
 
-def set_diff(list_a, list_b):
-    in_a_not_b = list(set(list_a) - set(list_b))
-    in_b_not_a = list(set(list_b) - set(list_a))
-    print('length of in list a but not in list b: ' + str(len(in_a_not_b)))
-    print('length of in list b but not in list a: ' + str(len(in_b_not_a)))
-    return in_a_not_b, in_b_not_a
+    except:
+        run_time = '?'
+        start_date = '?'
+    
+    # create pop up message or send email
+    if kind == 'popup':
+        popup_msg(code_desc, run_time, start_date, end_date)
+    if kind == 'email':
+        email_msg(code_desc, run_time, start_date, end_date, extd_desc)
+    
+    # save out to csv file 
+    row = {'Code_Desc': code_desc, 'Run_Time': run_time, 
+           'Start_Time': start_date, 'End_Time': end_date, 
+           'Extended_desc': extd_desc}
+    log = pd.read_csv(get_path() + 'code_run_log.csv')
+    log = log.append(row, ignore_index=True)
+    try:
+        log.to_csv(get_path() + 'code_run_log.csv', index = False)
+    except:
+        log.to_csv(get_path() + 'code_run_log_TEMP.csv', index = False)
+        print("saved temp version bc can't overwrite open version")
+    
+        
+def t():
+    '''
+    returns current time in seconds since the Epoch. used for input to msg()
+
+    '''
+    return(time.time())
 
 #%%
 # Examples of running query
