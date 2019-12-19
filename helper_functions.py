@@ -36,6 +36,10 @@ import math
 import time
 import sys
 import tkinter as tk
+import time
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from datetime import datetime
 from tkinter import ttk
 from shutil import copy
@@ -251,13 +255,108 @@ def multilabel_train_test_split(X, Y, size, min_count=5, seed=None):
     return (X[train_set_mask], X[test_set_mask], Y[train_set_mask], 
             Y[test_set_mask])
 
-def msg(text = 'Finished Running Code'):
+def t():
+    '''
+    returns current time in seconds since the Epoch. used for input to msg()
+
+    '''
+    return(time.time())
+
+def msg(start_time = '?', 
+        code_desc = '?', 
+        body = '', 
+        my_email = 'py.notify1@gmail.com', 
+        prd = 'yourfunny1', 
+        send_email = 'tommywlang@gmail.com', 
+        ):
+    '''
+    Sends an email message for tracking when code is done running
+
+    Parameters
+    ----------
+    start_time : TYPE: number, optional
+        current time in seconds since the Epoch. The default is '?'.
+    code_desc : TYPE: string, optional
+        description of code being run. The default is '?'.
+    body : TYPE: string, optional
+        body of email message. The default is ''.
+    my_email : TYPE: string, optional
+        from email address. The default is 'py.notify1@gmail.com'.
+    prd : TYPE: string, optional
+        password of email address. The default is 'yourfunny1'.
+    send_email : TYPE: string, optional
+        email address being sent to. The default is 'tommywlang@gmail.com'.
+
+    Returns
+    -------
+    None.
+
+    '''
+    
+    # end time in seconds and end time/date
+    end_time = time.time()
+    end_date = time.strftime('%m/%d/%y - %H:%M:%S', 
+                             time.localtime((end_time)))
+    
+    # calc start date/time and runtime if possible
+    try:
+        # date/time of start and elapsed time in seconds
+        start_date = time.strftime('%m/%d/%y - %H:%M:%S',
+                           time.localtime((start_time)))
+        runtime = end_time - start_time
+        
+        # if run time is greater 180 days then its prob wrong
+        if runtime > 180*86400:
+            runtime = '?'        
+        elif runtime <= 120: # report 2 min or less in seconds
+            runtime = str(round(runtime, 1)) + ' sec'
+        elif runtime <= 7200: # report 2 hours or less in mins
+            runtime = str(round(runtime/60, 1)) + ' min'   
+        else: 
+            runtime = str(round(runtime/3600, 1)) + ' hr'
+
+    except:
+        runtime = '?'
+        start_date = '?'
+    
+    email_subject = 'DESC: {} | RUNTIME: {} | START: {} | END: {}'\
+        .format(code_desc, runtime, start_date, end_date)
+    
+    # connect to SMTP server
+    s = smtplib.SMTP(host='smtp.gmail.com', port=587)
+    s.starttls()
+    s.login(my_email, prd)
+    
+    # create email message
+    email = MIMEMultipart()
+    email['From'] = my_email
+    email['To'] = send_email 
+    email['Subject'] = email_subject
+    if body != '':
+        email.attach(MIMEText(body, 'plain'))
+    
+    # send email
+    s.send_message(email)
+    
+    
+def popup_msg(text = 'Finished Running Code'):
     '''
     creates poopup message with passed in text
+
+    Parameters
+    ----------
+    text : TYPE: string, optional
+        text displayed in popup msg. The default is 'Finished Running Code'.
+
+    Returns
+    -------
+    None.
+
     '''
     popup = tk.Tk()
     popup.wm_title("Message")
     
+    # text in popup message
     label = ttk.Label(popup, text=text, font=("Verdana", 12))
     label.pack(pady=10,padx=10)
     cur_time = datetime.now().strftime("%H:%M:%S")
@@ -266,10 +365,11 @@ def msg(text = 'Finished Running Code'):
     space = ttk.Label(popup, text= '', font=("Verdana", 12))
     space.pack(pady=10,padx=10)
     
+    # close button on pop up message
     B1 = ttk.Button(popup, text="Close", command = popup.destroy)
     B1.pack()
     
-    popup.geometry('300x200')
+    popup.geometry('300x200') # size
     popup.mainloop()
 
 def set_diff(list_a, list_b):
