@@ -28,7 +28,7 @@ Installation:
     
 ###############################################################################
 """
-#%%
+#%% Load Libs
 import os
 import cx_Oracle
 import pandas as pd
@@ -44,7 +44,8 @@ from datetime import datetime
 from tkinter import ttk
 from shutil import copy
 
-#%%
+#%% Update Module
+
 src = 'C:/Users/tommy/Dropbox/7. projects/py_helper_functions/helper_functions.py'
 def update_mod(destination = 'default', source = src):
     '''Copy helper_functions.py file to 4th PYTHONPATH directory'''
@@ -59,8 +60,7 @@ def update_mod(destination = 'default', source = src):
 
 # update_mod()
     
-#%%
-# Functions for file directory
+#%% File Path
 
 def get_path(name = 'tom'):
     '''Returns string for file path to directory. Ex: get_path('tom')'''
@@ -80,8 +80,7 @@ def set_dir(name = 'tom'):
     else:
         raise ValueError("Not a valid argument to set_dir(). Use 'tom' or 'team'.")
         
-#%%
-# Functions for DB query
+#%% DB query
         
 # Oracle parameters used to construct the database connection string
 hosts = [
@@ -152,8 +151,8 @@ def read_chunks(query, chunksize, rows):
     
     return(df)
 
-#%%
-# Misc functions
+#%% Data Wrangling
+
     
 def missing_value_df(df, sort = False):
     '''
@@ -429,8 +428,7 @@ def t():
     '''
     return(time.time())
 
-#%%
-# Examples of running query
+#%% Run Query Example
 
 if __name__ == '__main__':
     
