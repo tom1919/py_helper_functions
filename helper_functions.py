@@ -379,9 +379,9 @@ def msg(start_time = '?', code_desc = '?', extd_desc = '', kind = 'popup'):
 
     Example
     -------
-    t = hf.t()
+    start_time = hf.t()
     *** block of code to be logged
-    hf.msg(t, 'desc of code', 'extended desc of code being run')
+    hf.msg(start_time, 'desc of code', 'extended desc of code being run')
 
     '''
     
