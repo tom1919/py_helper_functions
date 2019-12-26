@@ -337,7 +337,15 @@ def compare_df(left_df, right_df, join_key = None, rounding = 8):
         equal_bool = both[col + '_left'].fillna(999).eq(both[col + '_right'], 
                                             fill_value = 999)
         diff_idx = equal_bool[equal_bool==False].index
-        diff_dict[col] = list(diff_idx)
+        if len(diff_idx) > 0:    
+            diff_dict[col] = list(diff_idx)
+    
+    # drop keys where there's no differences        
+    diff_dict = {key: value for key, value in diff_dict.items() 
+                 if len(value) > 0}
+    
+    if len(diff_dict) == 0:
+        print('The 2 DFs are an exact match.')
     
     return(diff_dict)
 
