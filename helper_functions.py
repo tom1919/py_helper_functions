@@ -269,8 +269,8 @@ def set_diff(list_a, list_b):
 
 def compare_df(left_df, right_df, join_key = None, rounding = 8):
     '''
-    Compare differeces betweeen two dataframes. May change index of input DFs.
-
+    Compare differeces betweeen two dataframes. 
+    
     Parameters
     ----------
     left_df : Dataframe
@@ -281,7 +281,7 @@ def compare_df(left_df, right_df, join_key = None, rounding = 8):
         column names to join the DFs. Default value will join by index
     rounding : integer, optional
         number of decimal places to round values being comapred.
-
+        
     Returns
     -------
     Returns a dictionary with the intersecting cols as keys and lists of 
@@ -290,7 +290,6 @@ def compare_df(left_df, right_df, join_key = None, rounding = 8):
         - right_only_cols: list of col names that are only in the right_df
         - left_only_rows: list of indices that are only in the left_df
         - right_only_rows: list of incdices that are only in the right_df
-        - joined_df: full join of the 2 DFs by index. only intersecting cols.
     '''
     
     # reset index for joining DFs. 
@@ -305,6 +304,7 @@ def compare_df(left_df, right_df, join_key = None, rounding = 8):
         # set index to join_key. This will change index of input DFs
         right_df.set_index(join_key, inplace = True)
         left_df.set_index(join_key, inplace = True)
+        print('DF index is reset.')
         
     # cols that are only in left DF, right DF and in both DFs
     left_only_cols = list(set(left_df.columns) - set(right_df.columns))
@@ -329,8 +329,7 @@ def compare_df(left_df, right_df, join_key = None, rounding = 8):
     diff_dict = {'left_only_cols': left_only_cols,
                   'right_only_cols': right_only_cols,
                   'left_only_rows': list(left_only_rows.index),
-                  'right_only_rows': list(right_only_rows.index),
-                  'joined_df': joined}
+                  'right_only_rows': list(right_only_rows.index)}
     
     # row indcies where value differ for each col in the dfs
     for col in both_cols:
