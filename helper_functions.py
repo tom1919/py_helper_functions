@@ -267,6 +267,37 @@ def set_diff(list_a, list_b):
     print('length of in list b but not in list a: ' + str(len(in_b_not_a)))
     return in_a_not_b, in_b_not_a
 
+def truncate(nums, digits):
+    '''
+    Truncate a Series or DataFrame of numbers 
+    
+    Parameters
+    ----------
+    nums: DataFrame or Series
+        numeric data to truncate 
+    digits: integer
+        the number of digits to the right of decimal to keep
+    
+    Returns
+    -------
+    DataFrame or Series with numeric columns truncated to specified digits 
+    '''
+    
+    # multiplier
+    stepper = 10.0 ** digits
+    
+    # if input is a Series then shift digits and truncate 
+    if isinstance(nums, pd.Series):
+        return np.trunc(stepper * nums) / stepper
+    # if input is a DF then then apply truncate to each numeric col
+    elif isinstance(nums, pd.DataFrame):
+        num_cols = nums.select_dtypes(include=['float64']).columns
+        nums2 = nums.copy()
+        nums2[num_cols] = nums2[num_cols].aggregate(truncate, digits = digits)
+        return nums2
+    else:
+        raise TypeError("Expected nums to be a Series or DataFrame")
+
 def compare_df(left_df, right_df, join_key = None, rounding = 8):
     '''
     Compare differeces betweeen two dataframes. 
