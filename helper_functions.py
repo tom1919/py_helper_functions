@@ -378,7 +378,17 @@ def compare_df(left_df, right_df, join_key = None, rounding = 8):
     if len(diff_dict) == 0:
         print('The 2 DFs are an exact match.')
     
-    return(diff_dict)
+    # put contents of diff_dict into a DF
+    cols = []
+    size = []
+    ids = []
+    for key in diff_dict.keys():
+        cols.append(key)
+        size.append(len(diff_dict[key]))
+        ids.append(diff_dict[key])
+    diff_df = pd.DataFrame({'col_name': cols, 'diff_cnt': size, 'index': ids})
+
+    return(diff_df)
 
 #%% Code Run Time Log
 
