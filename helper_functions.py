@@ -271,6 +271,129 @@ def set_diff(list_a, list_b):
     print('length of in list b but not in list a: ' + str(len(in_b_not_a)))
     return in_a_not_b, in_b_not_a
 
+def truncate(nums, digits):
+    '''
+    Truncate a Series or DataFrame of numbers 
+    
+    Parameters
+    ----------
+    nums: DataFrame or Series
+        numeric data to truncate 
+    digits: integer
+        the number of digits to the right of decimal to keep
+    
+    Returns
+    -------
+    DataFrame or Series with numeric columns truncated to specified digits 
+    '''
+    
+    # multiplier
+    stepper = 10.0 ** digits
+    
+    # if input is a Series then shift digits and truncate 
+    if isinstance(nums, pd.Series):
+        return np.trunc(stepper * nums) / stepper
+    # if input is a DF then then apply truncate to each numeric col
+    elif isinstance(nums, pd.DataFrame):
+        num_cols = nums.select_dtypes(include=['float64']).columns
+        nums2 = nums.copy()
+        nums2[num_cols] = nums2[num_cols].aggregate(truncate, digits = digits)
+        return nums2
+    else:
+        raise TypeError("Expected nums to be a Series or DataFrame")
+
+def compare_df(left_df, right_df, join_key = None, rounding = 8):
+    '''
+    Compare differeces betweeen two dataframes. 
+    
+    Parameters
+    ----------
+    left_df : Dataframe
+        first dataframe to be compared
+    right_df : Dataframe
+        second dataframe to be compared
+    join_key : String or List, optional
+        column names to join the DFs. Default value will join by index
+    rounding : integer, optional
+        number of decimal places to round values being comapred.
+        
+    Returns
+    -------
+    Returns a dictionary with the intersecting cols as keys and lists of 
+    indcies where the cols in the 2 DFs differ as values. Also includes:
+        - left_only_cols: list of col names that are only in left_df
+        - right_only_cols: list of col names that are only in the right_df
+        - left_only_rows: list of indices that are only in the left_df
+        - right_only_rows: list of incdices that are only in the right_df
+    '''
+    
+    # reset index for joining DFs. 
+    if join_key != None: # if join_key is none then just join by default index
+        
+        # if there's index set already then convert them to cols
+        if right_df.index.names != [None]:
+            right_df.reset_index(inplace = True)
+        if left_df.index.names != [None]:
+            left_df.reset_index(inplace = True)
+        
+        # set index to join_key. This will change index of input DFs
+        right_df.set_index(join_key, inplace = True)
+        left_df.set_index(join_key, inplace = True)
+        print('DF index is reset.')
+        
+    # cols that are only in left DF, right DF and in both DFs
+    left_only_cols = list(set(left_df.columns) - set(right_df.columns))
+    right_only_cols = list(set(right_df.columns) - set(left_df.columns))
+    both_cols = set.intersection(set(left_df.columns), set(right_df.columns))
+    
+    # subset dfs so they only contain common cols
+    left_df2 = left_df.loc[:,both_cols]
+    right_df2 = right_df.loc[:,both_cols]
+    
+    # join dfs on their index
+    joined = pd.merge(left_df2, right_df2, how = 'outer',
+                      left_index = True, right_index = True,
+                      suffixes=('_left', '_right'), indicator = True)
+    
+    # rows that are only in left DF, right DF and in both DFs
+    left_only_rows = joined.loc[joined._merge == 'left_only', :]
+    right_only_rows = joined.loc[joined._merge == 'right_only', :]
+    both = joined.loc[joined._merge == 'both',: ].round(rounding)
+    
+    # create dict to store the differences
+    diff_dict = {'left_only_cols': left_only_cols,
+                  'right_only_cols': right_only_cols,
+                  'left_only_rows': list(left_only_rows.index),
+                  'right_only_rows': list(right_only_rows.index)}
+    
+    # row indcies where value differ for each col in the dfs
+    for col in both_cols:
+        # fill NA bc NaN != NaN with pd.Series.eq()
+        equal_bool = both[col + '_left'].fillna(999).eq(both[col + '_right'], 
+                                            fill_value = 999)
+        diff_idx = equal_bool[equal_bool==False].index
+        if len(diff_idx) > 0:    
+            diff_dict[col] = list(diff_idx)
+    
+    # drop keys where there's no differences        
+    diff_dict = {key: value for key, value in diff_dict.items() 
+                 if len(value) > 0}
+    
+    if len(diff_dict) == 0:
+        print('The 2 DFs are an exact match.')
+    
+    # put contents of diff_dict into a DF
+    cols = []
+    size = []
+    ids = []
+    for key in diff_dict.keys():
+        cols.append(key)
+        size.append(len(diff_dict[key]))
+        ids.append(diff_dict[key])
+    diff_df = pd.DataFrame({'col_name': cols, 'diff_cnt': size, 'index': ids})
+
+    return(diff_df)
+
 #%% Code Run Time Log
 
 def popup_msg(code_desc, run_time, start_time, end_time):
