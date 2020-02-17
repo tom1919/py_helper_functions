@@ -33,7 +33,7 @@ Installation:
 """
 #%% Load Libs
 import os
-import cx_Oracle
+#import cx_Oracle
 import pandas as pd
 import numpy as np
 import math
@@ -46,6 +46,8 @@ from email.mime.text import MIMEText
 from datetime import datetime
 from tkinter import ttk
 from shutil import copy
+import logging
+from functools import wraps
 
 #%% Update Module
 
@@ -74,6 +76,8 @@ def get_path(name = 'tom'):
         ret_path = 'C:/Users/'
     elif name == 'tom':
         ret_path = 'C:/Users/tommy/Dropbox/7. projects/'
+    elif name == 'mp':
+        ret_path = 'C:/Users/tommy/Dropbox/7. projects/mo_portfolio/'
     else:
         raise ValueError("Not a valid argument to get_path(). Use 'tom' or 'team'.")
     return ret_path
@@ -436,6 +440,105 @@ def t():
 
     '''
     return(time.time())
+
+#%% Logging
+    
+def create_logger(path):
+    '''
+    Returns a Logger object
+
+    Parameters
+    ----------
+    path : str
+        file path to log.
+
+    Returns
+    -------
+    logger : logging.Logger
+        logger object to be used for logging...
+
+    '''
+    
+    # create logger
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    
+    # Create handlers (console and file)
+    c_handler = logging.StreamHandler()
+    f_handler = logging.FileHandler(path)
+
+    # Create formatters and add it to handlers
+    f = logging.Formatter('%(asctime)s | %(name)s | %(levelname)s | %(message)s')
+    c_handler.setFormatter(f)
+    f_handler.setFormatter(f)
+    
+    # Add handlers to the logger
+    logger.addHandler(f_handler)
+    logger.addHandler(c_handler)    
+    
+    return logger
+    
+    
+def log(func, logger):
+    '''
+    decorator that creates a logs of functions calls
+
+    Parameters
+    ----------
+    func : function
+        a function to log everytime it runs.
+
+    Returns
+    -------
+        returns output of input function.
+
+    '''
+    
+    @wraps(func)
+    
+    def wrapper(*args, **kwargs):
+        
+        start = time.time()
+        logger.info('Started Func: {} | Args: {} | Kwargs: {}'\
+                    .format(func.__name__, args, kwargs))
+        
+        result = func(*args, **kwargs)
+        
+        # format run time
+        run_time = time.time() - start
+        if run_time <= 120: # report 2 min or less in seconds
+            run_time = str(round(run_time, 2)) + ' sec'
+        elif run_time <= 7200: # report 2 hours or less in mins
+            run_time = str(round(run_time/60, 2)) + ' min'   
+        else: 
+            run_time = str(round(run_time/3600, 2)) + ' hr'
+            
+        logger.info('Finished Func: {} | Run Time: {}'\
+                    .format(func.__name__, run_time))
+        
+        return result
+    
+    return wrapper
+
+#example
+if __name__ == '__main__':
+    
+    import logging
+    from functools import wraps
+    import time
+    
+    logger = create_logger('C:/Users/tommy/Dropbox/7. projects/log_test.txt')
+    
+    def ret_str(str2):
+        time.sleep(1)
+        return(str2)
+    
+    ret_str = log(ret_str, logger)
+    
+    value = ret_str('example')
+    
+    logger.handlers = []
+
 
 #%% Run Query Example
 
