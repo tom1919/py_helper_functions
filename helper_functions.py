@@ -621,9 +621,17 @@ def log(func, logger):
     
     def wrapper(*args, **kwargs):
         
+	# replace DF arg with shape of DF so DF is'nt logged
+	new_args = []
+        for arg in args:
+            if isinstance(arg, pd.DataFrame):
+                new_args.append('DF: ' + str(arg.shape))
+            else:
+                new_args.append(arg)
+	
         start = time.time()
         logger.info('Started Func: {} | Args: {} | Kwargs: {}'\
-                    .format(func.__name__, args, kwargs))
+                    .format(func.__name__, new_args, kwargs))
         
         result = func(*args, **kwargs)
         
