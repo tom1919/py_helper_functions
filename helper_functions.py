@@ -633,8 +633,13 @@ def log(func, logger):
         logger.info('Started Func: {} | Args: {} | Kwargs: {}'\
                     .format(func.__name__, new_args, kwargs))
         
-        result = func(*args, **kwargs)
-        
+	# execute func and log any error stack trace
+	try:
+        	result = func(*args, **kwargs)
+	except Exception as exc: 
+        	logger.error(exc, exc_info = True)
+		raise
+		
         # format run time
         run_time = time.time() - start
         if run_time <= 120: # report 2 min or less in seconds
