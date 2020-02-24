@@ -564,6 +564,18 @@ def t():
     '''
     return(time.time())
 
+def print_progress(msg):
+    '''
+    Prints msg on the same line. Used for tracking loop progress
+    
+    Parameters:
+    ----------
+        msg : str
+            message to print
+    '''
+    spaces = '                                '
+    print('\r' + msg + spaces, flush = True, end = '')
+
 #%% Logging
     
 def create_logger(path):
