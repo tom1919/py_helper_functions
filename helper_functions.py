@@ -12,7 +12,7 @@ TODO:
 Functions:
     1. update_mod(destination = 'default', source = src) 
     2. get_path(name = 'tom')
-    3. set_dir(name = 'tom')
+    3. chdir(name = 'tom')
     4. open_db()
     5. read_chunks(query, chunksize, rows)
     6. missing_value_df(df, sort = False)
@@ -82,13 +82,28 @@ def get_path(name = 'tom'):
         raise ValueError("Not a valid argument to get_path(). Use 'tom' or 'team'.")
     return ret_path
 
-def set_dir(name = 'tom'):
+def chdir(name = 'tom'):
+    '''
+    Changes the working directory
+
+    Parameters
+    ----------
+    name : str, optional
+        path of directory to change to. The default is 'tom'.
+
+    Returns
+    -------
+    None.
+
+    '''
     if name == 'team':
         os.chdir(get_path('team'))
     elif name == 'tom':
         os.chdir(get_path('tom'))
     else:
-        raise ValueError("Not a valid argument to set_dir(). Use 'tom' or 'team'.")
+        # ASCII \a == \x07
+        os.chdir(name.replace('\\', '/').replace('\x07', '/a')\
+                 .replace('\x08', '/b'))
         
 #%% DB query
         
