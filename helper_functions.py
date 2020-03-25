@@ -39,6 +39,8 @@ import numpy as np
 import math
 import time
 import sys
+import decimal
+import collections
 import tkinter as tk
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -408,6 +410,51 @@ def compare_df(left_df, right_df, join_key = None, rounding = 8):
     diff_df = pd.DataFrame({'col_name': cols, 'diff_cnt': size, 'index': ids})
 
     return(diff_df)
+
+def to_decimal(df, cols):
+    '''
+    Convert specified cols in df to be Decimal objects for more precise calcs
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DF with cols you wish to convert to Decimal dtype
+    cols : str or iterable object
+        col names within DF to be converted to Decimal dtype
+
+    Raises
+    ------
+    TypeError
+        if cols arg is not right type an error is raised.
+
+    Returns
+    -------
+    df2 : pd.DataFrame
+        input DF with specified cols converted to Decimal dtype.
+        
+    Example
+    -------
+    df = pd.DataFrame(np.random.randint(0,100, size=(10,4)), 
+                      columns = list('ABCD'))
+    
+    to_decimal(df, ['A','D']).dtypes
+    to_decimal(df, 'A').dtypes
+    to_decimal(df, df.columns).dtypes
+    '''
+    
+    df2 = df.copy()
+    
+    if isinstance(cols, str):
+        df2[cols] = df2[cols].apply(lambda x: decimal.Decimal(x))
+        
+    elif isinstance(cols, collections.abc.Iterable):
+        for col in cols:
+            df2[col] = to_decimal(df2, col)
+    
+    else:
+        raise TypeError('Expected cols to be str or iterable object')
+    
+    return df2
 
 #%% Code Run Time Log
 
