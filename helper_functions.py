@@ -342,6 +342,7 @@ def compare_df(left_df, right_df, join_key = None, rounding = 8):
         - right_only_cols: list of col names that are only in the right_df
         - left_only_rows: list of indices that are only in the left_df
         - right_only_rows: list of incdices that are only in the right_df
+	- col_dtype_diff: list of cols that have diff data tyoes
     '''
     
     # reset index for joining DFs. 
