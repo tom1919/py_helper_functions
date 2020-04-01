@@ -377,11 +377,16 @@ def compare_df(left_df, right_df, join_key = None, rounding = 8):
     right_only_rows = joined.loc[joined._merge == 'right_only', :]
     both = joined.loc[joined._merge == 'both',: ].round(rounding)
     
+    # columns that have diff data types
+    dtype_diff = left_df2.dtypes.eq(right_df2.dtypes)
+    dtype_diff = dtype_diff[dtype_diff == False].index
+
     # create dict to store the differences
     diff_dict = {'left_only_cols': left_only_cols,
                   'right_only_cols': right_only_cols,
                   'left_only_rows': list(left_only_rows.index),
-                  'right_only_rows': list(right_only_rows.index)}
+                  'right_only_rows': list(right_only_rows.index),
+                  'col_dtype_diff': list(dtype_diff)}
     
     # row indcies where value differ for each col in the dfs
     for col in both_cols:
