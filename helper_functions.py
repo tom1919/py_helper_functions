@@ -736,6 +736,14 @@ def log(func, logger):
     
     return wrapper
 
+def reset():
+    try:
+        from IPython import get_ipython
+        get_ipython().magic('clear')
+        get_ipython().magic('reset -f')
+    except:
+        pass
+
 #example
 if __name__ == '__main__':
     
