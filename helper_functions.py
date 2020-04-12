@@ -487,7 +487,7 @@ def popup_msg(code_desc, run_time, start_time, end_time):
     '''
   
     popup = tk.Tk()
-    popup.eval('tk::PlaceWindow . center')
+    popup.eval('tk::PlaceWindow . center') # center window
     popup.wm_title("Code Runtime Log")
     
     # text in popup message
@@ -509,6 +509,8 @@ def popup_msg(code_desc, run_time, start_time, end_time):
     
     # popup.geometry('300x200') # size
     popup.after(1000 * 30, lambda: popup.destroy()) # close after 30 secs
+    popup.iconify() # helps to prevent window starting as minimized
+    popup.deiconify()
     popup.mainloop() 
 
 def email_msg(code_desc, run_time, start_date, end_date, body):
