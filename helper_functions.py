@@ -5,6 +5,7 @@
 The module "helper_functions" contains functions that I frequently use.
 
 @author: Tommy Lang
+Date: 4/12/20
 
 TODO:
     1. update docs
@@ -486,6 +487,7 @@ def popup_msg(code_desc, run_time, start_time, end_time):
     '''
   
     popup = tk.Tk()
+    popup.eval('tk::PlaceWindow . center')
     popup.wm_title("Code Runtime Log")
     
     # text in popup message
@@ -702,7 +704,7 @@ def log(func, logger):
     def wrapper(*args, **kwargs):
         
 	# replace DF arg with shape of DF so DF is'nt logged
-	new_args = []
+        new_args = []
         for arg in args:
             if isinstance(arg, pd.DataFrame):
                 new_args.append('DF: ' + str(arg.shape))
@@ -714,12 +716,12 @@ def log(func, logger):
                     .format(func.__name__, new_args, kwargs))
         
 	# execute func and log any error stack trace
-	try:
+        try:
         	result = func(*args, **kwargs)
-	except Exception as exc: 
-        	logger.error(exc, exc_info = True)
-		raise
-		
+        except Exception as exc: 
+            logger.error(exc, exc_info = True)
+            raise
+            
         # format run time
         run_time = time.time() - start
         if run_time <= 120: # report 2 min or less in seconds
